@@ -14,26 +14,28 @@ Collection of random bash scripts for setting up things on Linux Mint and other 
 ### install-kodi.sh
 Installs **Kodi** (commonly referred to as Cody) on Linux Mint using the recommended Flatpak method (user-level install).
 
-The official Team Kodi PPA is no longer maintained, so Flatpak/Flathub is the preferred way to get the latest version.
-
 **Usage:**
 ```bash
-chmod +x install-kodi.sh
-./install-kodi.sh
-# or
 bash install-kodi.sh
 ```
 
 ### launch-kodi.sh
-Launches Kodi. Prefers the user Flatpak install, then system Flatpak, then apt package.
+Launches Kodi. Prefers the user Flatpak install.
 
 **Usage:**
 ```bash
-chmod +x launch-kodi.sh
-./launch-kodi.sh
-# or
 bash launch-kodi.sh
 ```
+
+### install-grok-bot.sh
+Installs **Grok Bot** (the desktop Electron app) on Linux Mint / Ubuntu via the official Cursor apt repository.
+
+**Usage:**
+```bash
+bash install-grok-bot.sh
+```
+
+After install, launch from the menu or with `grok-bot`. Requires an account that includes Grok Bot access.
 
 ---
 
