@@ -2,6 +2,7 @@
 #
 # Install Kodi (often called Cody) on Linux Mint via Flatpak
 # Flatpak is the current recommended method as the Team Kodi PPA is no longer maintained.
+# Uses user-level install to avoid "Deploy not allowed for user" errors.
 #
 # Usage: bash install-kodi.sh
 # or: chmod +x install-kodi.sh && ./install-kodi.sh
@@ -31,26 +32,25 @@ else
     echo "Flatpak is already installed."
 fi
 
-# Add Flathub remote if not already added
-echo "[3/5] Setting up Flathub..."
-if ! flatpak remote-list | grep -q flathub; then
-    echo "Adding Flathub repository..."
-    flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+# Add Flathub remote for the user if not already added
+echo "[3/5] Setting up Flathub (user)..."
+if ! flatpak remote-list --user | grep -q flathub; then
+    echo "Adding Flathub repository for user..."
+    flatpak remote-add --if-not-exists --user flathub https://flathub.org/repo/flathub.flatpakrepo
 else
-    echo "Flathub is already configured."
+    echo "Flathub is already configured for user."
 fi
 
-# Install Kodi
-echo "[4/5] Installing Kodi from Flathub..."
-flatpak install -y flathub tv.kodi.Kodi
+# Install Kodi as user
+echo "[4/5] Installing Kodi from Flathub (user)..."
+flatpak install --user -y flathub tv.kodi.Kodi
 
-# Optional: Create a simple launcher note or desktop entry reminder
 echo "[5/5] Setup complete!"
 echo
-echo "Kodi has been installed via Flatpak."
+echo "Kodi has been installed via Flatpak (user)."
 echo "You can launch it from the application menu (search for Kodi)"
 echo "or from the terminal with:"
-echo "  flatpak run tv.kodi.Kodi"
+echo "  flatpak run --user tv.kodi.Kodi"
 echo
 echo "First launch will create your ~/.var/app/tv.kodi.Kodi/ data directory."
 echo "For HTPC setups, consider enabling hardware acceleration in Settings > Player > Videos."
