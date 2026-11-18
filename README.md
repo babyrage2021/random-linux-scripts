@@ -11,17 +11,22 @@ The official Team Kodi PPA is no longer maintained, so Flatpak/Flathub is the pr
 
 **Usage:**
 ```bash
-# Make executable and run
 chmod +x install-kodi.sh
 ./install-kodi.sh
-
-# Or just run with bash
-bash install-kodi.sh
 ```
 
-After installation, launch Kodi from the menu or with:
+### launch-kodi.sh
+Launches Kodi. Prefers the Flatpak version if installed, falls back to a system package.
+
+**Usage:**
 ```bash
-flatpak run tv.kodi.Kodi
+chmod +x launch-kodi.sh
+./launch-kodi.sh
+```
+
+Or just:
+```bash
+bash launch-kodi.sh
 ```
 
 ---
