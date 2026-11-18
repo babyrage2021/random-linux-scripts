@@ -27,6 +27,18 @@ Launches Kodi. Prefers the user Flatpak install.
 bash launch-kodi.sh
 ```
 
+### setup-kodi-autostart.sh
+Sets Kodi to autostart on login in **windowed** mode.
+
+Creates `~/.config/autostart/kodi.desktop` and tries to force windowed mode via Kodi's settings files.
+
+**Usage:**
+```bash
+bash setup-kodi-autostart.sh
+```
+
+True minimized start is not practical with Kodi; windowed is the closest option. You can minimize the window after it starts.
+
 ### install-grok-bot.sh
 Installs **Grok Bot** (the desktop Electron app) on Linux Mint / Ubuntu via the official Cursor apt repository.
 
@@ -34,8 +46,6 @@ Installs **Grok Bot** (the desktop Electron app) on Linux Mint / Ubuntu via the 
 ```bash
 bash install-grok-bot.sh
 ```
-
-After install, launch from the menu or with `grok-bot`. Requires an account that includes Grok Bot access.
 
 ---
 
