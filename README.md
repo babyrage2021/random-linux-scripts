@@ -47,6 +47,24 @@ Installs **Grok Bot** (the desktop Electron app) on Linux Mint / Ubuntu via the 
 bash install-grok-bot.sh
 ```
 
+### install-proton-drive.sh
+Installs the unofficial community Proton Drive Linux client (narrrl/proton-drive-linux) and lets you choose the mount folder.
+
+**Usage:**
+```bash
+bash install-proton-drive.sh
+```
+
+### pull-all-repos.sh + git-pull-all.service
+Finds all Git repos under `$HOME` (or given paths) and pulls them safely (`--ff-only`, skips dirty trees).
+The `.service` file is a user systemd oneshot that runs it on login.
+
+**Usage:**
+```bash
+bash pull-all-repos.sh
+# or install the service (see comments in git-pull-all.service)
+```
+
 ---
 
 More scripts coming soon for various Linux Mint setups.
