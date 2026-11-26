@@ -79,7 +79,30 @@ mapfile -t REPOS < <(
   done | sort -u
 )
 
-log "Found ${#REPOS[@]} repositories"
+log "Found ${#REPOS[@]} candidate directories"
+
+# Drop any directory that contains another found repo inside it.
+# This avoids treating a parent folder (e.g. ~/git) as a repo when
+# the real repositories are its children.
+FILTERED=()
+for repo in "${REPOS[@]}"; do
+  is_parent=false
+  for other in "${REPOS[@]}"; do
+    [[ "$other" == "$repo" ]] && continue
+    if [[ "$other" == "$repo"/* ]]; then
+      is_parent=true
+      break
+    fi
+  done
+  if ! $is_parent; then
+    FILTERED+=("$repo")
+  else
+    log "Ignoring parent directory (contains other repos): $repo"
+  fi
+done
+REPOS=("${FILTERED[@]}")
+
+log "Using ${#REPOS[@]} repositories"
 
 # ---------- pull function ----------
 pull_one() {
