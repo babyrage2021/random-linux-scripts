@@ -55,15 +55,17 @@ Installs the unofficial community Proton Drive Linux client (narrrl/proton-drive
 bash install-proton-drive.sh
 ```
 
-### pull-all-repos.sh + git-pull-all.service
+### pull-all-repos.sh + setup-git-pull-all.sh
 Finds all Git repos under `$HOME` (or given paths) and pulls them safely (`--ff-only`, skips dirty trees).
-The `.service` file is a user systemd oneshot that runs it on login.
+`setup-git-pull-all.sh` installs the script into `~/bin` and enables a user systemd service that runs it on login.
 
 **Usage:**
 ```bash
-bash pull-all-repos.sh
-# or install the service (see comments in git-pull-all.service)
+bash pull-all-repos.sh          # one-off run
+bash setup-git-pull-all.sh      # install + enable service
 ```
+
+Log is written to `~/.local/state/pull-all-repos.log`.
 
 ---
 
