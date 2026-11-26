@@ -86,8 +86,9 @@ pull_one() {
   local repo="$1"
   log "---- $repo ----"
 
-  if [[ ! -d "$repo/.git" ]]; then
-    log "  Skipping: not a git repo"
+  # Confirm it is a real git work tree
+  if ! git -C "$repo" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    log "  Skipping: not a valid git work tree"
     return
   fi
 
@@ -111,10 +112,14 @@ pull_one() {
     pull_cmd=("git" "-C" "$repo" "pull" "--rebase")
   fi
 
-  if "${pull_cmd[@]}" >> "$LOG_FILE" 2>&1; then
+  # Capture output so we can show the real error
+  local output
+  if output=$("${pull_cmd[@]}" 2>&1); then
     log "  Success"
+    [[ -n "$output" ]] && echo "$output" | sed 's/^/    /' | tee -a "$LOG_FILE"
   else
-    log "  FAILED (see log)"
+    log "  FAILED"
+    echo "$output" | sed 's/^/    /' | tee -a "$LOG_FILE"
   fi
 }
 
