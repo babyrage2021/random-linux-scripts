@@ -37,39 +37,52 @@ if [[ "$(uname -m)" != "x86_64" ]]; then
   die "This script currently supports only x86_64 (amd64)."
 fi
 
-# Rough check for a recent enough base (Ubuntu 24.04 / Mint 22+)
+# ---------- decide install method ----------
+USE_DEB=true
 if command -v lsb_release >/dev/null 2>&1; then
   UBUNTU_VER=$(lsb_release -rs 2>/dev/null || echo "unknown")
   if [[ "$UBUNTU_VER" =~ ^[0-9]+\.[0-9]+$ ]]; then
-    # crude numeric compare: require >= 24.04
     major=${UBUNTU_VER%%.*}
     if (( major < 24 )); then
-      echo "WARNING: Detected Ubuntu $UBUNTU_VER. The .deb is built for Ubuntu 24.04+."
-      echo "         Installation may fail on older systems (e.g. Linux Mint 21.x)."
-      read -r -p "Continue anyway? [y/N] " ans
-      [[ "${ans,,}" == "y" ]] || exit 0
+      info "Detected Ubuntu $UBUNTU_VER (likely Linux Mint 21.x)."
+      info "The .deb requires Ubuntu 24.04+. Using the home-directory tarball installer instead."
+      USE_DEB=false
     fi
   fi
 fi
 
-# ---------- download latest .deb ----------
+# ---------- download ----------
 info "Fetching latest release information from GitHub..."
 TMP_DIR=$(mktemp -d)
 trap 'rm -rf "$TMP_DIR"' EXIT
 
 API_JSON=$(curl -fsSL "https://api.github.com/repos/$REPO/releases/latest")
-DEB_URL=$(echo "$API_JSON" | grep -o 'https://[^"]*proton-drive-linux_[^"]*_amd64\.deb' | head -n1)
 
-[[ -n "$DEB_URL" ]] || die "Could not find an amd64 .deb in the latest release."
+if $USE_DEB; then
+  ASSET_URL=$(echo "$API_JSON" | grep -o 'https://[^"]*proton-drive-linux_[^"]*_amd64\.deb' | head -n1)
+  [[ -n "$ASSET_URL" ]] || die "Could not find an amd64 .deb in the latest release."
+  ASSET_FILE="$TMP_DIR/$(basename "$ASSET_URL")"
+  info "Downloading $ASSET_URL ..."
+  curl -fL --progress-bar -o "$ASSET_FILE" "$ASSET_URL"
 
-DEB_FILE="$TMP_DIR/$(basename "$DEB_URL")"
-info "Downloading $DEB_URL ..."
-curl -fL --progress-bar -o "$DEB_FILE" "$DEB_URL"
+  info "Installing package (sudo required)..."
+  sudo apt-get update -qq
+  sudo apt-get install -y "./$ASSET_FILE" || sudo dpkg -i "$ASSET_FILE" && sudo apt-get install -f -y
+else
+  ASSET_URL=$(echo "$API_JSON" | grep -o 'https://[^"]*proton-drive-linux-[^"]*-x86_64\.tar\.gz' | head -n1)
+  [[ -n "$ASSET_URL" ]] || die "Could not find an x86_64 tarball in the latest release."
+  ASSET_FILE="$TMP_DIR/$(basename "$ASSET_URL")"
+  info "Downloading $ASSET_URL ..."
+  curl -fL --progress-bar -o "$ASSET_FILE" "$ASSET_URL"
 
-# ---------- install ----------
-info "Installing package (sudo required)..."
-sudo apt-get update -qq
-sudo apt-get install -y "./$DEB_FILE" || sudo dpkg -i "$DEB_FILE" && sudo apt-get install -f -y
+  info "Extracting and running home-directory installer..."
+  tar -xzf "$ASSET_FILE" -C "$TMP_DIR"
+  INSTALL_DIR=$(find "$TMP_DIR" -maxdepth 1 -type d -name 'proton-drive-linux-*' | head -n1)
+  [[ -n "$INSTALL_DIR" && -x "$INSTALL_DIR/install.sh" ]] || die "install.sh not found in tarball."
+
+  "$INSTALL_DIR/install.sh" --check || true
+  "$INSTALL_DIR/install.sh"
+fi
 
 # ---------- ask for mount folder ----------
 echo
