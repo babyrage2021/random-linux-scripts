@@ -1,0 +1,33 @@
+# ~/.config/systemd/user/git-pull-all.service
+# User systemd service that pulls all git repos on login
+#
+# Install:
+#   mkdir -p ~/.config/systemd/user
+#   cp git-pull-all.service ~/.config/systemd/user/
+#   # Edit the ExecStart path if you move the script
+#   systemctl --user daemon-reload
+#   systemctl --user enable --now git-pull-all.service
+#
+# Check status / logs:
+#   systemctl --user status git-pull-all.service
+#   journalctl --user -u git-pull-all.service -e
+#   cat ~/.local/state/pull-all-repos.log
+
+[Unit]
+Description=Pull all Git repositories on login
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+# Adjust the path to where you put pull-all-repos.sh
+ExecStart=%h/bin/pull-all-repos.sh
+# Or if you keep it in the project folder:
+# ExecStart=%h/Projects/RandomLinuxScripts/pull-all-repos.sh
+StandardOutput=journal
+StandardError=journal
+# Optional: limit how long it can run
+TimeoutStartSec=300
+
+[Install]
+WantedBy=default.target
