@@ -98,6 +98,12 @@ pull_one() {
     return
   fi
 
+  # Check for upstream tracking
+  if ! git -C "$repo" rev-parse --abbrev-ref --symbolic-full-name '@{u}' >/dev/null 2>&1; then
+    log "  Skipping: no upstream tracking branch set"
+    return
+  fi
+
   # Check dirty working tree
   if ! $FORCE; then
     if ! git -C "$repo" diff --quiet --exit-code 2>/dev/null || \
